@@ -3,12 +3,6 @@ resource "google_bigquery_dataset" "dataset" {
   location   = "EU"
 }
 
-resource "google_bigquery_table" "tmp_sentinelone_issues" {
-  dataset_id = google_bigquery_dataset.dataset.dataset_id
-  table_id   = "tmp_sentinelone_issues"
-  schema     = file("${path.module}/bq_schemas/tmp_sentinelone_issues.json")
-}
-
 resource "google_bigquery_table" "sentinelone_issues" {
   dataset_id = google_bigquery_dataset.dataset.dataset_id
   table_id   = "sentinelone_issues"
@@ -40,33 +34,21 @@ resource "google_storage_bucket_iam_member" "sentinelone_issues_bucket_permissio
   member     = "serviceAccount:${google_service_account.bq-scheduled-query-sa.email}"
 }
 
-# resource "google_project_iam_member" "permissions" {
-#   project = "sentinelone-428814"
-#   role   = "roles/iam.serviceAccountShortTermTokenMinter"
-#   member = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-bigquerydatatransfer.iam.gserviceaccount.com"
-# }
-
 # --- Scheduled queries ---
 
-resource "google_bigquery_data_transfer_config" "issues_load_to_tmp_query_config" {
-  # depends_on = [google_project_iam_member.permissions, google_project_iam_member.bq-scheduled-query-sa-iam]
-
+resource "google_bigquery_data_transfer_config" "issues_tmp_load_query_config" {
   display_name           = "sentinelone_issues_tmp_load"
   location               = "EU"
   service_account_name   = google_service_account.bq-scheduled-query-sa.email
   data_source_id         = "scheduled_query"
-  schedule               = "${var.schedule_tmp}"
+  schedule               = "${var.schedule_tmp_load}"
   destination_dataset_id = google_bigquery_dataset.dataset.dataset_id
   params = {
-    # destination_table_name_template = "${var.tmp_sentinelone_issues_table}"
-    # write_disposition               = "WRITE_TRUNCATE"
-    query                           =  "${file("bq_queries/issues_load_to_tmp.sql")}"
+    query                = "${file("bq_queries/issues_tmp_load.sql")}"
   }
 }
 
 resource "google_bigquery_data_transfer_config" "issues_transform_upsert_query_config" {
-  # depends_on = [google_project_iam_member.permissions, google_project_iam_member.bq-scheduled-query-sa-iam]
-
   display_name           = "sentinelone_issues_transform_upsert"
   location               = "EU"
   service_account_name   = google_service_account.bq-scheduled-query-sa.email
@@ -74,8 +56,6 @@ resource "google_bigquery_data_transfer_config" "issues_transform_upsert_query_c
   schedule               = "${var.schedule_upsert}"
   destination_dataset_id = google_bigquery_dataset.dataset.dataset_id
   params = {
-    # destination_table_name_template = "${var.sentinelone_issues_table}"
-    # write_disposition               = "WRITE_APPEND"
-    query                           =  "${file("bq_queries/issues_transform_upsert.sql")}"
+    query                = "${file("bq_queries/issues_transform_upsert.sql")}"
   }
 }

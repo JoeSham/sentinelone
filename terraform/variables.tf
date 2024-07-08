@@ -14,7 +14,7 @@ variable "sentinelone_issues_table" {
     type = string
 }
 
-variable "schedule_tmp" {
+variable "schedule_tmp_load" {
     type = string
 }
 
