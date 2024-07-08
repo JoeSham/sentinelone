@@ -1,10 +1,10 @@
-resource "google_bigquery_dataset" "dataset" {
+resource "google_bigquery_dataset" "sentinelone_dataset" {
   dataset_id = "${var.dataset_id}"
   location   = "EU"
 }
 
 resource "google_bigquery_table" "sentinelone_issues" {
-  dataset_id = google_bigquery_dataset.dataset.dataset_id
+  dataset_id = google_bigquery_dataset.sentinelone_dataset.dataset_id
   table_id   = "sentinelone_issues"
   schema     = file("bq_schemas/sentinelone_issues.json")
 }
@@ -42,7 +42,7 @@ resource "google_bigquery_data_transfer_config" "issues_tmp_load_query_config" {
   service_account_name   = google_service_account.bq-scheduled-query-sa.email
   data_source_id         = "scheduled_query"
   schedule               = "${var.schedule_tmp_load}"
-  destination_dataset_id = google_bigquery_dataset.dataset.dataset_id
+  destination_dataset_id = google_bigquery_dataset.sentinelone_dataset.dataset_id
   params = {
     query                = "${file("bq_queries/issues_tmp_load.sql")}"
   }
@@ -54,7 +54,7 @@ resource "google_bigquery_data_transfer_config" "issues_transform_upsert_query_c
   service_account_name   = google_service_account.bq-scheduled-query-sa.email
   data_source_id         = "scheduled_query"
   schedule               = "${var.schedule_upsert}"
-  destination_dataset_id = google_bigquery_dataset.dataset.dataset_id
+  destination_dataset_id = google_bigquery_dataset.sentinelone_dataset.dataset_id
   params = {
     query                = "${file("bq_queries/issues_transform_upsert.sql")}"
   }

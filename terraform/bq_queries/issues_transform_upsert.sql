@@ -35,11 +35,14 @@ USING (
     JSON_VALUE(fields, '$.customfield_11118') AS proposed_text_for_limitation_or_resolved_issue,
     JSON_VALUE(fields, '$.customfield_10002.requestType.name') AS customer_request_type,
     JSON_VALUE(fields, '$.project.projectTypeKey') AS project_type,
-    JSON_VALUE(fields, '$.creator.displayName') AS channel
+    JSON_VALUE(fields, '$.creator.displayName') AS channel,
   FROM
     `sentinelone-428814.sentinelone.tmp_sentinelone_issues`
+  # to help remove duplicates in source data
+  QUALIFY ROW_NUMBER() OVER (PARTITION BY id ORDER BY JSON_VALUE(fields, '$.updated') DESC) = 1
 ) S
 ON T.id = S.id
+# check if unchanged to avoid unnecessary updates (todo: check if this is ok performance-wise)
 WHEN MATCHED AND (
     T.date != S.date OR
     T.expand != S.expand OR
