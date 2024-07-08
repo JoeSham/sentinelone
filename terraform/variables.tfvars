@@ -1,0 +1,6 @@
+project_id = "sentinelone-428814"
+dataset_id = "sentinelone"
+tmp_sentinelone_issues_table = "tmp_sentinelone_issues"
+sentinelone_issues_table = "sentinelone_issues"
+schedule_tmp = "every 1 hours from 00:10"
+schedule_upsert = "every 1 hours from 00:15"

@@ -1,0 +1,90 @@
+MERGE `sentinelone-428814.sentinelone.sentinelone_issues` T
+USING (
+  SELECT
+    PARSE_DATE('%Y-%m-%d', JSON_EXTRACT_SCALAR(t.fields, '$.dt')) AS date,
+    JSON_EXTRACT_SCALAR(t.fields, '$.expand') AS expand,
+    CAST(JSON_EXTRACT_SCALAR(t.fields, '$.id') AS NUMERIC) AS id,
+    JSON_EXTRACT_SCALAR(t.fields, '$.key') AS key,
+    JSON_EXTRACT_SCALAR(t.fields, '$.self') AS self,
+    SPLIT(JSON_EXTRACT_SCALAR(t.fields, '$.key'), '-')[SAFE_OFFSET(0)] AS project,
+    JSON_EXTRACT_SCALAR(t.fields, '$.project.name') AS project_name,
+    JSON_EXTRACT_SCALAR(t.fields, '$.issuetype.name') AS issue_type_name,
+    JSON_EXTRACT_SCALAR(t.fields, '$.resolution.name') AS resolution_name,
+    JSON_EXTRACT_SCALAR(t.fields, '$.created') AS created_date,
+    JSON_EXTRACT_SCALAR(t.fields, '$.resolutiondate') AS resolved_date,
+    JSON_EXTRACT_SCALAR(t.fields, '$.customfield_11169.value') AS severity,
+    JSON_EXTRACT_SCALAR(t.fields, '$.customfield_11067.value') AS team,
+    JSON_EXTRACT_SCALAR(t.fields, '$.customfield_11089.value') AS global_release,
+    JSON_EXTRACT_SCALAR(t.fields, '$.customfield_10026') AS story_points,
+    JSON_EXTRACT_SCALAR(t.fields, '$.priority') AS priority,
+    JSON_EXTRACT_SCALAR(t.fields, '$.customfield_11191.value') AS bug_type,
+    JSON_EXTRACT_SCALAR(t.fields, '$.summary') AS summary,
+    JSON_EXTRACT_SCALAR(t.fields, '$.customfield_11137') AS testing_scope,
+    JSON_EXTRACT_SCALAR(t.fields, '$.customfield_11130.value') AS engineering_area,
+    JSON_EXTRACT_SCALAR(t.fields, '$.customfield_11132') AS automation_test_name,
+    JSON_EXTRACT_SCALAR(t.fields, '$.status.name') AS status,
+    JSON_EXTRACT_SCALAR(t.fields, '$.reporter.displayName') AS reporter,
+    JSON_EXTRACT_SCALAR(t.fields, '$.assignee.displayName') AS assignee_name,
+    JSON_EXTRACT_SCALAR(t.fields, '$.customfield_10948') AS total_acv,
+    JSON_EXTRACT_SCALAR(t.fields, '$.customfield_11087.value') AS program,
+    JSON_EXTRACT_SCALAR(t.fields, '$.customfield_11104') AS execution_comments,
+    JSON_EXTRACT_SCALAR(t.fields, '$.customfield_11079.value') AS display_in_big_picture,
+    JSON_EXTRACT_SCALAR(t.fields, '$.updated') AS updated,
+    JSON_EXTRACT_SCALAR(t.fields, '$.customfield_11099.value') AS engineering_feedback,
+    JSON_EXTRACT_SCALAR(t.fields, '$.customfield_11118') AS proposed_text_for_limitation_or_resolved_issue,
+    JSON_EXTRACT_SCALAR(t.fields, '$.customfield_10002.requestType.name') AS customer_request_type,
+    JSON_EXTRACT_SCALAR(t.fields, '$.project.projectTypeKey') AS project_type,
+    JSON_EXTRACT_SCALAR(t.fields, '$.creator.displayName') AS channel
+  FROM
+    `sentinelone-428814.sentinelone.tmp_sentinelone_issues` t
+) S
+ON T.id = S.id
+WHEN MATCHED THEN
+  UPDATE SET
+    T.date = S.date,
+    T.expand = S.expand,
+    T.key = S.key,
+    T.self = S.self,
+    T.project = S.project,
+    T.project_name = S.project_name,
+    T.issue_type_name = S.issue_type_name,
+    T.resolution_name = S.resolution_name,
+    T.created_date = S.created_date,
+    T.resolved_date = S.resolved_date,
+    T.severity = S.severity,
+    T.team = S.team,
+    T.global_release = S.global_release,
+    T.story_points = S.story_points,
+    T.priority = S.priority,
+    T.bug_type = S.bug_type,
+    T.summary = S.summary,
+    T.testing_scope = S.testing_scope,
+    T.engineering_area = S.engineering_area,
+    T.automation_test_name = S.automation_test_name,
+    T.status = S.status,
+    T.reporter = S.reporter,
+    T.assignee_name = S.assignee_name,
+    T.total_acv = S.total_acv,
+    T.program = S.program,
+    T.execution_comments = S.execution_comments,
+    T.display_in_big_picture = S.display_in_big_picture,
+    T.updated = S.updated,
+    T.engineering_feedback = S.engineering_feedback,
+    T.proposed_text_for_limitation_or_resolved_issue = S.proposed_text_for_limitation_or_resolved_issue,
+    T.customer_request_type = S.customer_request_type,
+    T.project_type = S.project_type,
+    T.channel = S.channel
+WHEN NOT MATCHED THEN
+  INSERT (
+    date, expand, id, key, self, project, project_name, issue_type_name, resolution_name,
+    created_date, resolved_date, severity, team, global_release, story_points, priority, bug_type,
+    summary, testing_scope, engineering_area, automation_test_name, status, reporter, assignee_name,
+    total_acv, program, execution_comments, display_in_big_picture, updated, engineering_feedback,
+    proposed_text_for_limitation_or_resolved_issue, customer_request_type, project_type, channel
+  ) VALUES (
+    S.date, S.expand, S.id, S.key, S.self, S.project, S.project_name, S.issue_type_name, S.resolution_name,
+    S.created_date, S.resolved_date, S.severity, S.team, S.global_release, S.story_points, S.priority, S.bug_type,
+    S.summary, S.testing_scope, S.engineering_area, S.automation_test_name, S.status, S.reporter, S.assignee_name,
+    S.total_acv, S.program, S.execution_comments, S.display_in_big_picture, S.updated, S.engineering_feedback,
+    S.proposed_text_for_limitation_or_resolved_issue, S.customer_request_type, S.project_type, S.channel
+  )
