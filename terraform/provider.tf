@@ -1,4 +1,4 @@
 provider "google" {
-  project = "your-gcp-project-id"
+  project = "sentinelone-428814"
   region  = "europe-west1"
 }
