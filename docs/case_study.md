@@ -101,6 +101,11 @@ Given the task is quite straight-forward, has no complex dependencies, and all t
 * There are also [quotas for BigQuery load jobs](https://cloud.google.com/bigquery/quotas#load_jobs), so we would need to make sure we are not exceeding them. They seem relatively large (i.e. up to 5 TB filesize for an uncompressed JSON file), but in case some of the quotas were not enough, we would need to consider other solutions (i.e. streaming via BigQuery Storage Write API)
 * Also of course the load jobs might take quite a bit of time to finish if the data are very large, and will likely take up a lot of BigQuery slots. Depending on whether we are using [on-demand or capacity-based pricing model](https://cloud.google.com/bigquery/docs/reservations-workload-management), we might need to reserve some dedicated slots for these jobs, especially if they are run predictably (i.e. daily at the same time)
 
+## Further TODOs
+* DQ Checks
+* Testing on real data and ensuring our BigQuery will be able to handle it fine (dedicated slots, choosing good time when not many other jobs are running, ...)
+* Possibly column descriptions, ensuring naming standards are met, ...
+
 ## Solution / code on Github
 
 * [github.com/JoeSham/sentinelone](https://github.com/JoeSham/sentinelone)
