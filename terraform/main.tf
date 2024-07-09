@@ -5,7 +5,7 @@ resource "google_bigquery_dataset" "sentinelone_dataset" {
 
 resource "google_bigquery_table" "sentinelone_issues" {
   dataset_id = google_bigquery_dataset.sentinelone_dataset.dataset_id
-  table_id   = "sentinelone_issues"
+  table_id   = "${var.sentinelone_issues_table}"
   schema     = file("bq_schemas/sentinelone_issues.json")
 }
 
