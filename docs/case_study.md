@@ -1,7 +1,10 @@
 ## Sentinelone Task: Load issues to BQ
 
-<small>Date: 2024-07-09
-Written by: Josef Samanek</small>
+<sub>Date: 2024-07-09<br/>
+Written by: Josef Samanek</sub>
+
+## Task overview
+Create a process/pipeline to regularly load and transform data from a json file in Cloud Storage to BigQuery.
 
 ## Considered solutions
 
