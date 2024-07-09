@@ -94,6 +94,13 @@ Given the task is quite straight-forward, has no complex dependencies, and all t
 * Note 2: this assumes input file is stored in an already existing Cloud Storage Bucket (if not, then of course that has to be done as well)
 
 
+## Notes regarding data size
+
+* The test dataset was small, but for a more real-world scenario with much larger data, we would likely need to partition the BigQuery table, probably based on one of the time columns (or ingestion date)
+* Depending on the size of the data, and our priorities, we would need to decide whether to use compressed or uncompressed input files. Compressed cost less on storage, but take more time loading to BigQuery as it can't be done in parallel, uncompresed is loaded faster but requires more storage. More in [BigQuery data loading docs](https://cloud.google.com/bigquery/docs/batch-loading-data#loading_compressed_and_uncompressed_data)
+* There are also [quotas for BigQuery load jobs](https://cloud.google.com/bigquery/quotas#load_jobs), so we would need to make sure we are not exceeding them. They seem relatively large (i.e. up to 5 TB filesize for an uncompressed JSON file), but in case some of the quotas were not enough, we would need to consider other solutions (i.e. streaming via BigQuery Storage Write API)
+* Also of course the load jobs might take quite a bit of time to finish if the data are very large, and will likely take up a lot of BigQuery slots. Depending on whether we are using [on-demand or capacity-based pricing model](https://cloud.google.com/bigquery/docs/reservations-workload-management), we might need to reserve some dedicated slots for these jobs, especially if they are run predictably (i.e. daily at the same time)
+
 ## Solution / code on Github
 
-* [https://github.com/JoeSham/sentinelone](https://github.com/JoeSham/sentinelone)
+* [github.com/JoeSham/sentinelone](https://github.com/JoeSham/sentinelone)
